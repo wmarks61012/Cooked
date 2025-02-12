@@ -1,0 +1,84 @@
+--// SERVICES
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local TextChatService = game:GetService("TextChatService")
+
+--// FORCE GUI TO LOAD
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = CoreGui
+ScreenGui.Name = "SpamGui"
+
+--// CREATE FRAME (MOVABLE)
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 180, 0, 60)
+Frame.Position = UDim2.new(0.4, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Frame.BorderSizePixel = 2
+Frame.Active = true
+Frame.Draggable = true
+
+--// CREATE BUTTON
+local Button = Instance.new("TextButton")
+Button.Parent = Frame
+Button.Size = UDim2.new(1, 0, 1, 0)
+Button.Text = "Start Spam"
+Button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Font = Enum.Font.SourceSansBold
+Button.TextSize = 20
+
+--// UI CORNERS (ROUNDED EDGES)
+local UICorner = Instance.new("UICorner")
+UICorner.Parent = Frame
+UICorner.CornerRadius = UDim.new(0, 10)
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.Parent = Button
+ButtonCorner.CornerRadius = UDim.new(0, 8)
+
+--// SPAM SETTINGS
+local spamDelay = 0.3 -- Adjust delay if needed
+local spamWord = "You are so obese and fat" -- The word being spammed
+local started = false -- Prevents multiple activations
+
+--// BLOCKER GUI (Prevents Clicking)
+local BlockerGui = Instance.new("ScreenGui")
+BlockerGui.Parent = CoreGui
+BlockerGui.Name = "BlockerGui"
+
+local BlockerFrame = Instance.new("Frame")
+BlockerFrame.Parent = BlockerGui
+BlockerFrame.Size = UDim2.new(1, 0, 1, 0) -- Covers the whole screen
+BlockerFrame.Position = UDim2.new(0, 0, 0, 0)
+BlockerFrame.BackgroundTransparency = 1 -- Fully invisible but still blocks clicks
+BlockerFrame.Active = true -- Makes it block clicks
+BlockerFrame.ZIndex = 10 -- Puts it above everything else
+BlockerFrame.Visible = false -- Starts OFF until spam is enabled
+
+--// SPAM FUNCTION (Runs Forever)
+local function SpamMessage()
+    while true do
+        pcall(function()
+            TextChatService.TextChannels.RBXGeneral:SendAsync(spamWord)
+        end)
+        wait(spamDelay)
+    end
+end
+
+--// BUTTON FUNCTION (Only Works Once)
+Button.MouseButton1Click:Connect(function()
+    if started then return end -- Prevents multiple activations
+    started = true
+
+    -- Change UI and block interactions forever
+    Button.Text = "get pranked"
+    Button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    BlockerFrame.Visible = true -- Block menu permanently
+    Button.Active = false -- Disable button to prevent stopping
+
+    -- Start the spam (forever)
+    SpamMessage()
+end)
